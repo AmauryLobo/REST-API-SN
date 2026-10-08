@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ws_operation">
+    <sys_ws_operation action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <consumes>application/json,application/xml,text/xml</consumes>
+        <consumes_customized>false</consumes_customized>
+        <default_operation_uri/>
+        <enforce_acl/>
+        <http_method>POST</http_method>
+        <name>Criar Incidente</name>
+        <operation_script><![CDATA[(function process(/*RESTAPIRequest*/ request, /*RESTAPIResponse*/ response) {
+
+    // 1. Capturar o "pacote" de dados (JSON) enviado
+    var body = request.body.data;
+
+    // 2. Preparar o ServiceNow para criar um novo registro na tabela 'incident'
+    var grIncident = new GlideRecord('incident');
+    grIncident.initialize(); // Inicia um registro em branco
+
+    // 3. Preencher os campos do incidente com os dados exatos do teu JSON
+    grIncident.short_description = body.short_description;
+    grIncident.description = body.description;
+    grIncident.contact_type = 'integration'; // Define a origem do chamado
+
+    // 4. Salvar o registro no banco de dados e guardar o ID gerado
+    var incidentId = grIncident.insert();
+
+    // 5. Montar a resposta que o ServiceNow vai devolver para o sistema externo
+    response.setStatus(201); // 201 é o código HTTP para "Registro Criado"
+    
+    // Devolvemos um JSON de confirmação com o número do chamado gerado
+    response.setBody({
+        "status": "sucesso",
+        "mensagem": "Incidente gerado via Webhook",
+        "numero_incidente": grIncident.getValue('number'),
+        "id_registro": incidentId
+    });
+
+})(request, response);]]></operation_script>
+        <operation_uri>/api/x_1319177_gatewa_0/webhook_de_monitoramento/create</operation_uri>
+        <produces>application/json,application/xml,text/xml</produces>
+        <produces_customized>false</produces_customized>
+        <relative_path>/create</relative_path>
+        <request_example/>
+        <requires_acl_authorization>true</requires_acl_authorization>
+        <requires_authentication>false</requires_authentication>
+        <requires_snc_internal_role>true</requires_snc_internal_role>
+        <short_description/>
+        <support_trailing_slash>false</support_trailing_slash>
+        <sys_class_name>sys_ws_operation</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2026-10-07 20:18:32</sys_created_on>
+        <sys_id>87a7412183b303d06275e430ceaad323</sys_id>
+        <sys_mod_count>2</sys_mod_count>
+        <sys_name>Criar Incidente</sys_name>
+        <sys_package display_value="Gateway de envio de incidentes" source="x_1319177_gatewa_0">f0affc9983738f906275e430ceaad34b</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Gateway de envio de incidentes">f0affc9983738f906275e430ceaad34b</sys_scope>
+        <sys_update_name>sys_ws_operation_87a7412183b303d06275e430ceaad323</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2026-10-08 12:36:09</sys_updated_on>
+        <web_service_definition display_value="Webhook de Monitoramento">c7514da9833303d06275e430ceaad3a1</web_service_definition>
+        <web_service_version/>
+    </sys_ws_operation>
+</record_update>
